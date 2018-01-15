@@ -9,7 +9,7 @@ public class Maman15a {
     
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.add(new TrafficLightPanel());
+        frame.add(new TrafficLightJunctionPanel());
         frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);

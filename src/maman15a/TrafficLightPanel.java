@@ -12,62 +12,66 @@ public class TrafficLightPanel extends JPanel {
     private final Color LIGHT_OFF_COLOR = Color.RED;
     private final int CIRCLE_X = 0;
     private final int CIRCLE_Y = 0;
-    private final int CIRCLE_DIAMETER = 100;
-    private final int RECTANGULAR_WIDTH = CIRCLE_DIAMETER / 2;
-    private final int RECTANGULAR_HEIGHT = CIRCLE_DIAMETER;
-    private final int RECTANGULAR_X = CIRCLE_DIAMETER / 4;
     private final int RECTANGULAR_Y = 0;
     
-    private boolean carsLightOn;
+    private boolean isCarsLightOn;
 
     public TrafficLightPanel(boolean carsLight) {
-        this.carsLightOn = carsLight;
+        this.isCarsLightOn = carsLight;
     }
 
     public TrafficLightPanel() {
-        this.carsLightOn = DEFAULT_CARS_LIGHT;
+        this.isCarsLightOn = DEFAULT_CARS_LIGHT;
     }
     
-    public boolean isCarsLightOn() {
-        return carsLightOn;
+    public boolean getCarsLight() {
+        return isCarsLightOn;
     }
 
-    public void setCarsLightOn(boolean carsLightOn) {
-        this.carsLightOn = carsLightOn;
+    public void setCarsLight(boolean carsLightOn) {
+        this.isCarsLightOn = carsLightOn;
         repaint();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        super.paintComponent(g); // ADD COMMENTSSSSSSSSSSSSSS!@#!@#@!
+        int circleDiameter = getHeight() / 4;
+        int widthOffset = (getWidth() - circleDiameter) / 2;
+        int rectWidth = circleDiameter / 2;
+        int rectX = circleDiameter / 4;
+        
         setBackground(BACKGROUND_COLOR);
         int heightOffset = 0;
         
         // Draw the first cars light
-        drawCarsLight(g, carsLightOn ? LIGHT_ON_COLOR : SHAPE_OFF_COLOR, heightOffset);
-        heightOffset += CIRCLE_DIAMETER;
+        drawCarsLight(g, isCarsLightOn ? LIGHT_ON_COLOR : SHAPE_OFF_COLOR, circleDiameter, heightOffset, widthOffset);
+        heightOffset += circleDiameter;
         
         // Draw the second cars light
-        drawCarsLight(g, carsLightOn ? SHAPE_OFF_COLOR : LIGHT_OFF_COLOR, heightOffset);
-        heightOffset += CIRCLE_DIAMETER;
+        drawCarsLight(g, isCarsLightOn ? SHAPE_OFF_COLOR : LIGHT_OFF_COLOR, circleDiameter, heightOffset, widthOffset);
+        heightOffset += circleDiameter;
         
         // Draw the first pedestrians light
-        drawPedestriansLight(g, carsLightOn ? SHAPE_OFF_COLOR : LIGHT_ON_COLOR, heightOffset);
-        heightOffset += RECTANGULAR_HEIGHT;
+        drawPedestriansLight(g, isCarsLightOn ? SHAPE_OFF_COLOR : LIGHT_ON_COLOR,
+                rectWidth, circleDiameter, rectX, heightOffset, widthOffset);
+        heightOffset += circleDiameter;
         
         // Draw the second pedestrians light
-        drawPedestriansLight(g, carsLightOn ? LIGHT_OFF_COLOR : SHAPE_OFF_COLOR, heightOffset);
+        drawPedestriansLight(g, isCarsLightOn ? LIGHT_OFF_COLOR : SHAPE_OFF_COLOR,
+                rectWidth, circleDiameter, rectX, heightOffset, widthOffset);
     }
     
-    private void drawCarsLight(Graphics g, Color color, int heightOffset) {
+    private void drawCarsLight(Graphics g, Color color, int diameter, int heightOffset, int widthOffset) {
         // Fill shape
         g.setColor(color);
-        g.fillOval(CIRCLE_X, heightOffset + CIRCLE_Y, CIRCLE_DIAMETER, CIRCLE_DIAMETER);
+        g.fillOval(widthOffset + CIRCLE_X, heightOffset + CIRCLE_Y, diameter, diameter);
     }
     
-    private void drawPedestriansLight(Graphics g, Color color, int heightOffset) {
+    private void drawPedestriansLight(Graphics g, Color color, int width, int height,
+            int rectX, int heightOffset, int widthOffset) {
         // Fill shape
         g.setColor(color);
-        g.fillRect(RECTANGULAR_X, heightOffset + RECTANGULAR_Y, RECTANGULAR_WIDTH, RECTANGULAR_HEIGHT);
+        g.fillRect(widthOffset + rectX, heightOffset + RECTANGULAR_Y, width, height);
     }
 }
