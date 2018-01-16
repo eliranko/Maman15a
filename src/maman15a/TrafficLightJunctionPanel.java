@@ -1,98 +1,144 @@
 package maman15a;
 
 import java.awt.GridLayout;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.JPanel;
 
-public class TrafficLightJunctionPanel extends JPanel implements Runnable {
-    private final int DEFAULT_TRAFFIC_LIGHTS_TIMER = 2000;
-    
+public class TrafficLightJunctionPanel extends JPanel {
+    private ExecutorService executor;
     private TrafficLightPanel leftTrafficLight;
     private TrafficLightPanel rightTrafficLight;
     private TrafficLightPanel upperTrafficLight;
     private TrafficLightPanel lowerTrafficLight;
-    private int lightsCycleTime;
 
+    /**
+     * Constructor
+     * @param leftTrafficLight left traffic light
+     * @param rightTrafficLight right traffic light
+     * @param upperTrafficLight upper traffic light
+     * @param lowerTrafficLight lower traffic light
+     */
     public TrafficLightJunctionPanel(TrafficLightPanel leftTrafficLight, TrafficLightPanel rightTrafficLight,
-            TrafficLightPanel upperTrafficLight, TrafficLightPanel lowerTrafficLight, int lightsCycleTime) {
-        this();
+            TrafficLightPanel upperTrafficLight, TrafficLightPanel lowerTrafficLight) {
+        // Set traffic lights
         this.leftTrafficLight = leftTrafficLight;
         this.rightTrafficLight = rightTrafficLight;
         this.upperTrafficLight = upperTrafficLight;
         this.lowerTrafficLight = lowerTrafficLight;
-        this.lightsCycleTime = lightsCycleTime;
         synchronizeTrafficLights();
-    }
-
-    public TrafficLightJunctionPanel(int lightsCycleTime) {
-        this();
-        this.lightsCycleTime = lightsCycleTime;
+        
+        // Add components
+        addTrafficsLightPanels();
     }
     
+    /**
+     * Constructor
+     * @param lightOnCycleTime cars light on cycle time
+     * @param lightOffCycleTime cars light off cycle time
+     */
+    public TrafficLightJunctionPanel(int lightOnCycleTime, int lightOffCycleTime) {
+        // Set traffic lights
+        this.leftTrafficLight = new TrafficLightPanel(lightOnCycleTime, lightOffCycleTime);
+        this.rightTrafficLight = new TrafficLightPanel(lightOnCycleTime, lightOffCycleTime);
+        this.upperTrafficLight = new TrafficLightPanel(lightOffCycleTime, lightOnCycleTime); // opposite times
+        this.lowerTrafficLight = new TrafficLightPanel(lightOffCycleTime, lightOnCycleTime);
+        synchronizeTrafficLights();
+        
+        // Add components
+        addTrafficsLightPanels();
+    }
+    
+    /**
+     * Empty constructor
+     */
     public TrafficLightJunctionPanel() {
         // Set traffic lights
         this.leftTrafficLight = new TrafficLightPanel();
         this.rightTrafficLight = new TrafficLightPanel();
         this.upperTrafficLight = new TrafficLightPanel();
         this.lowerTrafficLight = new TrafficLightPanel();
-        this.lightsCycleTime = DEFAULT_TRAFFIC_LIGHTS_TIMER;
         synchronizeTrafficLights();
         
         // Add components
         addTrafficsLightPanels();
     }
 
+    /**
+     * get left traffic light
+     * @return TrafficLightPanel object
+     */
     public TrafficLightPanel getLeftTrafficLight() {
         return leftTrafficLight;
     }
 
+    /**
+     * set left traffic light
+     * @param leftTrafficLight TrafficLightPanel object
+     */
     public void setLeftTrafficLight(TrafficLightPanel leftTrafficLight) {
         this.leftTrafficLight = leftTrafficLight;
-        synchronizeTrafficLights();
     }
 
+    /**
+     * get right traffic light
+     * @return TrafficLightPanel object
+     */
     public TrafficLightPanel getRightTrafficLight() {
         return rightTrafficLight;
     }
 
+    /**
+     * set right traffic light
+     * @param leftTrafficLight TrafficLightPanel object
+     */
     public void setRightTrafficLight(TrafficLightPanel rightTrafficLight) {
         this.rightTrafficLight = rightTrafficLight;
-        synchronizeTrafficLights();
     }
 
+    /**
+     * get upper traffic light
+     * @return TrafficLightPanel object
+     */
     public TrafficLightPanel getUpperTrafficLight() {
         return upperTrafficLight;
     }
 
+    /**
+     * set upper traffic light
+     * @param leftTrafficLight TrafficLightPanel object
+     */
     public void setUpperTrafficLight(TrafficLightPanel upperTrafficLight) {
         this.upperTrafficLight = upperTrafficLight;
-        synchronizeTrafficLights();
     }
 
+    /**
+     * get lower traffic light
+     * @return TrafficLightPanel object
+     */
     public TrafficLightPanel getLowerTrafficLight() {
         return lowerTrafficLight;
     }
 
+    /**
+     * set lower traffic light
+     * @param leftTrafficLight TrafficLightPanel object
+     */
     public void setLowerTrafficLight(TrafficLightPanel lowerTrafficLight) {
         this.lowerTrafficLight = lowerTrafficLight;
-        synchronizeTrafficLights();
     }
     
-    public void stop() {
+    /**
+     * Execute the traffic lights operations in the junction
+     */
+    public void execute() {
+        if(this.executor != null) return; // Executor already running
         
-    }
-    
-    @Override
-    public void run() {
-        while(true) {
-            try {
-                Thread.sleep(this.lightsCycleTime);
-                this.leftTrafficLight.setCarsLight(!this.leftTrafficLight.getCarsLight());
-                synchronizeTrafficLights();
-            }
-            catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        this.executor = Executors.newCachedThreadPool(); // add threads to thread pool
+        this.executor.execute(this.leftTrafficLight);
+        this.executor.execute(this.rightTrafficLight);
+        this.executor.execute(this.upperTrafficLight);
+        this.executor.execute(this.lowerTrafficLight);
     }
     
     private void addTrafficsLightPanels() {
@@ -111,20 +157,6 @@ public class TrafficLightJunctionPanel extends JPanel implements Runnable {
         add(new JPanel());
         add(this.rightTrafficLight);
         add(new JPanel());
-        
-        // Add place holders
-        JPanel[][] panelHolder = new JPanel[gridLayoutRows][gridLayoutColumn];
-        for(int i = 0; i < gridLayoutRows; i++) {
-            for (int j = 0; j < gridLayoutColumn; j++) {
-                panelHolder[i][j] = new JPanel();
-                //add(panelHolder[i][j]);
-            }
-        }
-        
-        //panelHolder[0][1].add(this.leftTrafficLight);
-        //panelHolder[1][0].add(this.upperTrafficLight);
-        //panelHolder[1][2].add(this.lowerTrafficLight);
-        //panelHolder[2][1].add(this.rightTrafficLight);
     }
     
     private void synchronizeTrafficLights() {
@@ -140,6 +172,6 @@ public class TrafficLightJunctionPanel extends JPanel implements Runnable {
         boolean leftTrafficCarsLight = this.leftTrafficLight.getCarsLight();
         this.rightTrafficLight.setCarsLight(leftTrafficCarsLight);
         this.upperTrafficLight.setCarsLight(!leftTrafficCarsLight); // Opposite light
-        this.lowerTrafficLight.setCarsLight(!leftTrafficCarsLight); // Opposite light
+        this.lowerTrafficLight.setCarsLight(!leftTrafficCarsLight);
     }
 }
